@@ -5,8 +5,6 @@ import advertising.mapper.dynamic.engine.data.InputData;
 import com.opencsv.exceptions.CsvValidationException;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 

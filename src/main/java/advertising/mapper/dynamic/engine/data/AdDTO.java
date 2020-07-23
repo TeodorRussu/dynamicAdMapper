@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
@@ -15,16 +14,20 @@ import java.util.Map;
 @AllArgsConstructor
 public class AdDTO {
 
-    private Map<String, String> field = new HashMap<>();
+    private Map<String, String> fields = new HashMap<>();
 
     @JsonAnyGetter
     public Map<String, String> any() {
-        return field;
+        return fields;
     }
 
     @JsonAnySetter
     public void set(String name, String value) {
-        field.put(name, value);
+        fields.put(name, value);
+    }
+
+    public String getFieldValue(String key){
+        return fields.get(key);
     }
 
 }

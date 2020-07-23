@@ -5,14 +5,12 @@ import advertising.mapper.dynamic.engine.data.InputData;
 import advertising.mapper.dynamic.engine.mapper.DynamicAdMapper;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -51,9 +49,12 @@ public class InputManagerImpl implements InputManager {
 
     @Override
     public InputData readInput() throws IOException {
-        //List<String> headers = readHeadersFromFile();
-        List<AdDTO> inputData = readAdsInputFromFile();
-        return null;
+        List<String> headers = readHeadersFromFile();
+        List<AdDTO> adsData = readAdsInputFromFile();
+        return InputData.builder()
+                .headers(headers)
+                .adsData(adsData)
+                .build();
     }
 
     @Override
@@ -74,28 +75,24 @@ public class InputManagerImpl implements InputManager {
     public List<AdDTO> readAdsInputFromFile() throws IOException {
         File file = s3FileReader.getInputFile(bucketName, inputFileName);
 
-//        String content = FileUtils.readFileToString(file,"UTF-8");
-//        FileUtils.write(file, content, "UTF-8");
-
-
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE, true);
 
 
-
+        AdDTO[] inputData = null;
         if (file.isFile()) {
             try {
-              AdDTO[] inputData = mapper.readValue(file, AdDTO[].class);
+              inputData = mapper.readValue(file, AdDTO[].class);
 
             } catch (JsonParseException | MismatchedInputException fileParsingException) {
                 log.error("File: {}, parsing error. Exception: {}. The file is invalid.", file.getName(),
                           fileParsingException.getMessage());
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
             }
         }
 
-        return null;
+        return Arrays.asList(inputData);
     }
 
 }
